@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Game of Life</title>
+    <style>
+     body {
+       position: absolute;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+     }
+     #fps {
+       white-space: pre;
+       font-family: monospace;
+     }
+     .setter {
+       display: inline-block;
+     }
+    </style>
+  </head>
+  <body>
+    <button id="play-pause"></button>
+    <div class="setter">
+      <button id="set-gliders"></button>
+      <button id="set-glider_gun"></button>
+    </div>
+    <div class="setter">
+        <textarea id="input_rle" cols="50" rows=4>x = 33, y = 21
+2o5b2o$2o5b2o2$4b2o$4b2o5$22b2ob2o$21bo5bo$21bo6bo2b2o$21b3o3bo3b2o$
+26bo4$20b2o$20bo$21b3o$23bo!</textarea>
+        <button id="submit"></button>
+        <span>Status: <span id="status"></span></span>
+    </div>
+    <canvas id="game-of-life-canvas"></canvas>
+    <span id="fps"></span>
+    <script src="./bootstrap.js"></script>
+  </body>
+</html>
