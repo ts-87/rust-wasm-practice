@@ -3,7 +3,8 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    gol: "./gol.js"
+    gol: "./gol.js",
+    rev: "./rev.js"
   },
   output: {
     path: path.resolve(__dirname, "dist"),
