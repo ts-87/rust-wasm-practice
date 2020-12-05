@@ -20,10 +20,8 @@ canvas.width = (CELL_SIZE + 1) * WIDTH + 1;
 const ctx = canvas.getContext('2d');
 /*
 const renderLoop = () => {
-
   drawGrid();
   drawCells();
-
   requestAnimationFrame(renderLoop);
 };
 */
@@ -148,21 +146,10 @@ changeButton.addEventListener("click", event => {
   aiTurn();
 });
 
-canvas.addEventListener("click", event => {
-    const boundingRect = canvas.getBoundingClientRect();
-  
-    const scaleX = canvas.width / boundingRect.width;
-    const scaleY = canvas.height / boundingRect.height;
-  
-    const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
-    const canvasTop = (event.clientY - boundingRect.top) * scaleY;
-  
-    const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), HEIGHT - 1);
-    const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), WIDTH - 1);
-  
-    const flipnum = reversi.set_op_piece(row * WIDTH + col);
+const myTurn = (row, col) => {
+  const flipnum = reversi.set_op_piece(row * WIDTH + col);
     if(flipnum == 0) {
-      return;
+      return false;
     }
     if(isfirst) {
       ctx.fillStyle = BLACK;
@@ -179,10 +166,27 @@ canvas.addEventListener("click", event => {
     countPiece.textContent = reversi.piece_count().toString();
     ++TURN;
     if (TURN == N) {
-      return;
+      return false;
     }
+    return true;
+}
 
-    aiTurn();
+canvas.addEventListener("click", event => {
+    const boundingRect = canvas.getBoundingClientRect();
+  
+    const scaleX = canvas.width / boundingRect.width;
+    const scaleY = canvas.height / boundingRect.height;
+  
+    const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
+    const canvasTop = (event.clientY - boundingRect.top) * scaleY;
+  
+    const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), HEIGHT - 1);
+    const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), WIDTH - 1);
+  
+    let ok = myTurn(row, col);
+    if(ok == false) return;
+    setTimeout(aiTurn, 0);
+    //aiTurn();
 });
 
 initBoard();
