@@ -1,11 +1,11 @@
 # Rust-wasm practice
 
-## About Contents
-- Game of Life
+## Contents
+- Game of Life  
   <a href="https://rustwasm.github.io/docs/book/game-of-life/introduction.html">Rust and WebAssembly</a>のチュートリアルをなぞって改造と高速化
   
-- Reversi
-  Reversi AI
+- Reversi  
+  Reversi AI  
   (simple αβ法 評価関数:石の数のみ)
 
 ## Usage
