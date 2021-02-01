@@ -11,6 +11,7 @@ const WHITE = "#FFFFFF";
 const BLACK = "#000000";
 let TURN = 0;
 let isfirst = true;
+let startTime = Date.now();
 
 const reversi = Reversi.new();
 
@@ -74,6 +75,8 @@ const countPiece = document.getElementById("count");
 countPiece.textContent = "0";
 const evaluationValue = document.getElementById("eval");
 evaluationValue.textContent = "0";
+const elapsedTime = document.getElementById("elapsed_time");
+elapsedTime.textContent = "0";
 
 const initBoard = () => {
     drawGrid();
@@ -88,6 +91,7 @@ const initBoard = () => {
 
 
 const aiTurn = () => {
+  
   if(isfirst) {
     ctx.fillStyle = WHITE;
   }
@@ -99,7 +103,7 @@ const aiTurn = () => {
     if (opflipnum == 0) {
       break;
     }
-
+    
     const opflipPtr = reversi.flip_list();
     const opflips = new Uint8Array(memory.buffer, opflipPtr, opflipnum);
     for (let pos = 0; pos < opflipnum; pos++) {
@@ -108,7 +112,7 @@ const aiTurn = () => {
     countPiece.textContent = reversi.piece_count().toString();
 
     evaluationValue.textContent = reversi.eval_value().toString();
-
+    elapsedTime.textContent = (Date.now() - startTime).toString();
     ++TURN;
     if (TURN == N) {
       break;
@@ -117,6 +121,7 @@ const aiTurn = () => {
       break;
     }
   }
+  
 }
 
 
@@ -185,8 +190,9 @@ canvas.addEventListener("click", event => {
   
     let ok = myTurn(row, col);
     if(ok == false) return;
+    startTime = Date.now();
     setTimeout(aiTurn, 0);
-    //aiTurn();
+    
 });
 
 initBoard();

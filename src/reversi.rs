@@ -81,6 +81,20 @@ impl Reversi {
         let mut next_pos = 0;
         let (mut low, high) = (-10000, 10000);
         let depth = if self.turn <= 40 {10} else {15};
+        
+        let pos = moves & !moves + 1;//本当は最善候補選ぶ
+        let flip = Reversi::flip_pieces(pos.trailing_zeros() as usize, self.my_pieces, self.op_pieces);
+        self.my_pieces |= flip; self.my_pieces |= pos;
+        self.op_pieces &= !flip;
+        let value = -self.alpha_beta_search(depth, -high, -low, self.turn + 1, false);
+        self.my_pieces &= !flip; self.my_pieces &= !pos;
+        self.op_pieces |= flip;
+        if low < value {
+            low = value;
+            next_pos = pos.trailing_zeros() as usize;
+        }
+        moves &= moves - 1;
+        
         while moves > 0 {
             let pos = moves & !moves + 1;
 
@@ -88,15 +102,22 @@ impl Reversi {
             self.my_pieces |= flip; self.my_pieces |= pos;
             self.op_pieces &= !flip;
             
-            let value = -self.alpha_beta_search(depth, -high, -low, self.turn + 1, false);
+            let mut value = -self.alpha_beta_search(depth, -low - 1, -low, self.turn + 1, false);
+            if low < value {
+                low = value;
+                next_pos = pos.trailing_zeros() as usize;
+                value = -self.alpha_beta_search(depth, -high, -low, self.turn + 1, false);
+            }
             
+            //let value = -self.alpha_beta_search(depth, -high, -low, self.turn + 1, false);
             self.my_pieces &= !flip; self.my_pieces &= !pos;
             self.op_pieces |= flip;
-
+            
             if low < value {
                 low = value;
                 next_pos = pos.trailing_zeros() as usize;
             }
+            
             moves &= moves - 1;
         }
 
@@ -124,6 +145,7 @@ impl Reversi {
         if depth == 0 || turn == N {
             return if is_myTurn {self.evaluate()} else {-self.evaluate()};
         }
+
         let mut moves =
         if is_myTurn {
             Reversi::get_moves(self.my_pieces, self.op_pieces)
@@ -136,6 +158,26 @@ impl Reversi {
             return -self.alpha_beta_search(depth - 1, -high, -low, turn, !is_myTurn);
         }
         let (pre_my, pre_op) = (self.my_pieces, self.op_pieces);
+
+        
+        let pos = moves & !moves + 1;//本当は最善候補選ぶ
+        if is_myTurn {
+            let flip = Reversi::flip_pieces(pos.trailing_zeros() as usize, self.my_pieces, self.op_pieces);
+            self.my_pieces |= flip; self.my_pieces |= pos;
+            self.op_pieces &= !flip;
+        }
+        else {
+            let flip = Reversi::flip_pieces(pos.trailing_zeros() as usize, self.op_pieces, self.my_pieces);
+            self.op_pieces |= flip; self.op_pieces |= pos;
+            self.my_pieces &= !flip;
+        }
+        let value = -self.alpha_beta_search(depth - 1, -high, -low, self.turn + 1, !is_myTurn);
+        self.my_pieces = pre_my;
+        self.op_pieces = pre_op;
+        low = std::cmp::max(low, value);
+        if low >= high {return low;}
+        moves &= moves - 1;
+        
         while moves > 0 {
             let pos = moves & !moves + 1;
             if is_myTurn {
@@ -148,15 +190,24 @@ impl Reversi {
                 self.op_pieces |= flip; self.op_pieces |= pos;
                 self.my_pieces &= !flip;
             }
-
-            let value = -self.alpha_beta_search(depth - 1, -high, -low, turn + 1, !is_myTurn);
             
+            let mut value = -self.alpha_beta_search(depth - 1, -low - 1, -low, self.turn + 1, !is_myTurn);
+            if high <= value {
+                self.my_pieces = pre_my;
+                self.op_pieces = pre_op;
+                return value;
+            }
+            if low < value {
+                low = value;
+                value = -self.alpha_beta_search(depth - 1, -high, -low, turn + 1, !is_myTurn);
+            }
+            
+            //let value = -self.alpha_beta_search(depth - 1, -high, -low, turn + 1, !is_myTurn);
             self.my_pieces = pre_my;
             self.op_pieces = pre_op;
-
             low = std::cmp::max(low, value);
             if low >= high {break;}
-
+            
             moves &= moves - 1;
         }
         return low;
